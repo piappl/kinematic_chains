@@ -1,0 +1,33 @@
+#ifndef KINEMATIC_CHAIN_HANDLER
+#define KINEMATIC_CHAIN_HANDLER
+
+#include "std_msgs/String.h"
+#include <kdl_parser/kdl_parser.hpp>
+#include <urdf/model.h>
+#include <kdl/frames.hpp>
+#include <kdl/chainiksolverpos_nr_jl.hpp>
+#include <kdl/chainiksolverpos_nr.hpp>
+#include <kdl/chainfksolverpos_recursive.hpp>
+#include <kdl/chainiksolvervel_pinv_givens.hpp>
+#include <tf/transform_broadcaster.h>
+#include <kdl/chainiksolvervel_pinv.hpp>
+
+using namespace KDL;
+
+class Manipulator
+{
+private:
+    Chain arm, effector, chain;
+    ChainIkSolverPos_NR* iksolverpos;
+    JntArray q_init, q;
+
+    void reinit();
+
+public:
+    Manipulator(Chain arm, Chain efector);
+    void changeEffector(Chain effector);
+    JntArray calculateIK(Frame destination);
+    Frame calculateFK(JntArray joints);
+};
+
+#endif

@@ -1,15 +1,7 @@
 #include "ros/ros.h"
-#include "std_msgs/String.h"
-#include <kdl_parser/kdl_parser.hpp>
-#include <urdf/model.h>
-#include <kdl/frames.hpp>
-#include <kdl/chainiksolverpos_nr_jl.hpp>
-#include <kdl/chainiksolverpos_nr.hpp>
-#include <kdl/chainfksolverpos_recursive.hpp>
-#include <kdl/chainiksolvervel_pinv_givens.hpp>
-#include <tf/transform_broadcaster.h>
-#include <kdl/chainiksolvervel_pinv.hpp>
 #include <sensor_msgs/Joy.h>
+#include <node/kinematic_chain_handler.hpp>
+
 
 double x = 0, y = 0, z = 0, X = 0, Y = 0, Z = 1;
 void joyCallback(const sensor_msgs::Joy::ConstPtr& msg)
@@ -17,7 +9,7 @@ void joyCallback(const sensor_msgs::Joy::ConstPtr& msg)
     x = X + msg->axes[0];
     y = Y + msg->axes[1];
     z = Z + msg->axes[2];
-    std::cout<<"joy callback!! "<< x<< ", "<<y<<std::endl;
+    //std::cout<<"joy "<< x<< ", "<<y<<std::endl;
 }
 
 KDL::Frame forward(KDL::ChainFkSolverPos_recursive fksolver, KDL::JntArray jnt, KDL::Chain chain, tf::TransformBroadcaster br, std::string prefix="")
@@ -70,7 +62,6 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "node");
     ros::NodeHandle n;
-    ros::Publisher pub = n.advertise<std_msgs::String>("message", 1000);    
     tf::TransformBroadcaster br;
 
     ros::Subscriber sub = n.subscribe("joy", 100, joyCallback);
@@ -78,31 +69,22 @@ int main(int argc, char **argv)
     ros::Rate loop_rate(20);
 
     KDL::Chain chain2, chain1;
-
-    chain1.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotZ),KDL::Frame(KDL::Vector(0.0,0.0,0.0))));
-    chain1.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotX),KDL::Frame(KDL::Vector(0.0,0.0,1.0))));
-    chain1.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotX),KDL::Frame(KDL::Vector(0.0,0.0,1.0))));
     
     chain2.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotZ),KDL::Frame(KDL::Vector(0.0,0.0,0.0))));
-    chain2.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotX),KDL::Frame(KDL::Vector(0.0,0.0,1.0))));
-    chain2.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotX),KDL::Frame(KDL::Vector(0.0,0.0,1.0))));
-    chain2.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotZ),KDL::Frame(KDL::Vector(0.0,0.0,0.))));
-    chain2.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotX),KDL::Frame(KDL::Vector(0.0,0.0,0.1))));
-    chain2.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotZ),KDL::Frame(KDL::Vector(0.0,0.0,0.0))));
+    chain2.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotX),KDL::Frame(KDL::Vector(0.0,0.0,1))));
+    chain2.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotY),KDL::Frame(KDL::Vector(0.0,0.0,0.1))));
+    chain2.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotX),KDL::Frame(KDL::Vector(0.0,0.0,0.5))));
+    chain2.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotY),KDL::Frame(KDL::Vector(0.0,0.0,0.2))));
 
-    KDL::ChainFkSolverPos_recursive fksolver1(chain1);
+
     KDL::ChainFkSolverPos_recursive fksolver2(chain2);
 
-    KDL::ChainIkSolverVel_pinv iksolver(chain2);//Inverse velocity solver
-    KDL::ChainIkSolverPos_NR iksolverpos(chain2,fksolver2,iksolver,100,1e-6);//Maximum 100 iterations, stop at accuracy 1e-6
+    Manipulator m = Manipulator(chain2, chain1);
 
-
-    KDL::JntArray jnt(chain1.getNrOfJoints());
-
-    KDL::JntArray q_init(chain2.getNrOfJoints());
 
     while (ros::ok())
     {
+        //std::cout<<"asd"<<std::endl;
 
         //****************************************************************************************************//
         //****************************************FORWARD KINEMATICS******************************************//
@@ -135,11 +117,9 @@ int main(int argc, char **argv)
         //****************************************************************************************************//
         //*****************************************IVERSE KINEMATICS******************************************//
         //****************************************************************************************************//
-        
-        KDL::JntArray q(chain2.getNrOfJoints());
-
-        int ret = iksolverpos.CartToJnt(q_init,destination,q);
-        q_init = q;
+        //std::cout<<"asd2"<<std::endl;
+        JntArray q = m.calculateIK(destination);
+        //std::cout<<"asd3"<<std::endl;
         forward(fksolver2, q, chain2, br, "iksolved_");
 
         ros::spinOnce();

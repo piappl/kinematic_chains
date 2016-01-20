@@ -14,6 +14,13 @@ find_package(catkin REQUIRED COMPONENTS
   tf
 )
 
+#file(GLOB SRC . *.cpp)
+#file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS include/node/*.hpp include/node/*.h)
+#file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS src/*.cpp include/node/*.h*)
+#include_directories(${catkin_INCLUDE_DIRS} include/node/)
+
+#add_executable(node ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+#add_executable(node src/node.cpp include/node/kinematic_chain_handler.hpp)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -118,6 +125,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
+    INCLUDE_DIRS include
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -132,7 +140,7 @@ include_directories(
 # add_dependencies(node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-add_executable(node src/node.cpp)
+add_executable(node src/node.cpp src/kinematic_chain_handler.cpp include/node/kinematic_chain_handler.hpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
