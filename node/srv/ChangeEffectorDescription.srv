@@ -1,0 +1,7 @@
+string parameter_name
+string base_joint
+string tip_joint
+
+---
+
+bool return_value

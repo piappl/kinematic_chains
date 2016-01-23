@@ -12,12 +12,15 @@ find_package(catkin REQUIRED COMPONENTS
   kdl_parser
   urdf
   tf
+  message_generation
+  sensor_msgs
+  geometry_msgs
 )
 
 #file(GLOB SRC . *.cpp)
 #file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS include/node/*.hpp include/node/*.h)
 #file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS src/*.cpp include/node/*.h*)
-#include_directories(${catkin_INCLUDE_DIRS} include/node/)
+include_directories(${catkin_INCLUDE_DIRS} include/node/)
 
 #add_executable(node ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
 #add_executable(node src/node.cpp include/node/kinematic_chain_handler.hpp)
@@ -62,11 +65,11 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+  FILES
+  CalculateIK.srv
+  ChangeEffectorDescription.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -76,10 +79,12 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  sensor_msgs
+  geometry_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -113,7 +118,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES node
-#  CATKIN_DEPENDS roscpp std_msgs
+#  CATKIN_DEPENDS roscpp std_msgs message_runtime geometry_msgs sensor_msgs
 #  DEPENDS system_lib
 )
 
@@ -140,7 +145,7 @@ include_directories(
 # add_dependencies(node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-add_executable(node src/node.cpp src/kinematic_chain_handler.cpp include/node/kinematic_chain_handler.hpp)
+add_executable(node src/main.cpp src/node.cpp src/manipulator.cpp include/node/manipulator.hpp include/node/node.hpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above

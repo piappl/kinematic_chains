@@ -14,20 +14,35 @@
 
 using namespace KDL;
 
+enum manipulator_part{
+    Arm,
+    Effector
+};
+
 class Manipulator
 {
 private:
     Chain arm, effector, chain;
     ChainIkSolverPos_NR* iksolverpos;
     JntArray q_init, q;
-
+    ChainFkSolverPos_recursive* fksolver;
+    ChainIkSolverVel_pinv* iksolver;
+    bool armInitialized, effectorInitialized;
     void reinit();
 
 public:
     Manipulator(Chain arm, Chain efector);
-    void changeEffector(Chain effector);
-    JntArray calculateIK(Frame destination);
+    Manipulator();
+    void setEffector(Chain chain);
+    void setArm(Chain chain);
+    bool calculateIK(Frame destination);
     Frame calculateFK(JntArray joints);
+    Chain getChain(){return chain;}
+    JntArray getJnts(){return q;}
+    bool isInitialized();
+
+
+
 };
 
 #endif

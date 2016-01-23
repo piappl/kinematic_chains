@@ -43,6 +43,7 @@ KinematicChainsNode::KinematicChainsNode(int argc, char **argv)
         }
     }
 }
+
 bool KinematicChainsNode::changeEffectorService(node::ChangeEffectorDescription::Request &req, node::ChangeEffectorDescription::Response &res)
 {
 

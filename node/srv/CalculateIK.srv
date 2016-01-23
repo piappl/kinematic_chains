@@ -1,0 +1,5 @@
+#goal pose
+geometry_msgs/Pose goal
+---
+#joint coordinates
+sensor_msgs/JointState jntCoordinates
