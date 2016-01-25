@@ -3,10 +3,10 @@
 
 #include "ros/ros.h"
 #include <sensor_msgs/Joy.h>
-#include <node/manipulator.hpp>
+#include <kinematic_chains/manipulator.hpp>
 #include <kdl_parser/kdl_parser.hpp>
-#include <node/CalculateIK.h>
-#include <node/ChangeEffectorDescription.h>
+#include <kinematic_chains/CalculateIK.h>
+#include <kinematic_chains/ChangeEffectorDescription.h>
 
 class KinematicChainsNode
 {
@@ -21,10 +21,10 @@ private:
     void publishForwardKinematics();
     void publishGoal();
     ros::ServiceServer service1, service2;
-    bool ikService(node::CalculateIK::Request &req,
-                   node::CalculateIK::Response &res);
-    bool changeEffectorService(node::ChangeEffectorDescription::Request &req,
-                               node::ChangeEffectorDescription::Response &res);
+    bool ikService(kinematic_chains::CalculateIK::Request &req,
+                   kinematic_chains::CalculateIK::Response &res);
+    bool changeEffectorService(kinematic_chains::ChangeEffectorDescription::Request &req,
+                               kinematic_chains::ChangeEffectorDescription::Response &res);
     KDL::Frame destination;
 public:
     KinematicChainsNode(int argc, char **argv);

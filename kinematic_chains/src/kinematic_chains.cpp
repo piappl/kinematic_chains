@@ -1,4 +1,4 @@
-#include <node/node.hpp>
+#include <kinematic_chains/kinematic_chains.hpp>
 
 KinematicChainsNode::KinematicChainsNode(int argc, char **argv)
 {
@@ -44,13 +44,13 @@ KinematicChainsNode::KinematicChainsNode(int argc, char **argv)
     }
 }
 
-bool KinematicChainsNode::changeEffectorService(node::ChangeEffectorDescription::Request &req, node::ChangeEffectorDescription::Response &res)
+bool KinematicChainsNode::changeEffectorService(kinematic_chains::ChangeEffectorDescription::Request &req, kinematic_chains::ChangeEffectorDescription::Response &res)
 {
 
     res.return_value = parseRobotDescription(req.parameter_name.c_str(), Effector, req.base_joint.c_str(), req.tip_joint.c_str());
 }
 
-bool KinematicChainsNode::ikService(node::CalculateIK::Request &req, node::CalculateIK::Response &res)
+bool KinematicChainsNode::ikService(kinematic_chains::CalculateIK::Request &req, kinematic_chains::CalculateIK::Response &res)
 {
     if(!manipulator->isInitialized())
     {

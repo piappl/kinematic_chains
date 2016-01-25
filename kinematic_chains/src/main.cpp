@@ -1,4 +1,4 @@
-#include <node/node.hpp>
+#include <kinematic_chains/kinematic_chains.hpp>
 #include <cstring>
 
 int main(int argc, char **argv)

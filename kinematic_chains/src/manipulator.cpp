@@ -1,4 +1,4 @@
-#include <node/manipulator.hpp>
+#include <kinematic_chains/manipulator.hpp>
 
 using namespace KDL;
 
