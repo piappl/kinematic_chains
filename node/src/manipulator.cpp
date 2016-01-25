@@ -75,7 +75,16 @@ bool Manipulator::isInitialized()
     return armInitialized && effectorInitialized;
 }
 
-
+std::string Manipulator::getJntName(int i)
+{
+    std::stringstream ss;
+    if(i <=arm.getNrOfJoints())
+        ss<<"arm_";
+    else
+        ss<<"effector_";
+    ss<<chain.getSegment(i).getJoint().getName();
+    return ss.str();
+}
 
 
 

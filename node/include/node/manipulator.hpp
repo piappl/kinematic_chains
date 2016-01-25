@@ -40,7 +40,7 @@ public:
     Chain getChain(){return chain;}
     JntArray getJnts(){return q;}
     bool isInitialized();
-
+    std::string getJntName(int i);
 
 
 };

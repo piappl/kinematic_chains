@@ -9,13 +9,13 @@ KinematicChainsNode::KinematicChainsNode(int argc, char **argv)
     {
         goal[i] = 0;
     }
-    joySubscriber = n->subscribe("joy", 100, &KinematicChainsNode::joyCallback, this);
+    //joySubscriber = n->subscribe("joy", 100, &KinematicChainsNode::joyCallback, this);
 
     br = new tf::TransformBroadcaster();
     manipulator = new Manipulator();
 
-    service = n->advertiseService("calculateIK",&KinematicChainsNode::ikService, this);
-    service = n->advertiseService("changeEffectorDescription",&KinematicChainsNode::changeEffectorService, this);
+    service1 = n->advertiseService("calculateIK",&KinematicChainsNode::ikService, this);
+    service2 = n->advertiseService("changeEffectorDescription",&KinematicChainsNode::changeEffectorService, this);
 
     // parsing joint names
     const char* arm_base = "link1";
@@ -43,6 +43,7 @@ KinematicChainsNode::KinematicChainsNode(int argc, char **argv)
         }
     }
 }
+
 bool KinematicChainsNode::changeEffectorService(node::ChangeEffectorDescription::Request &req, node::ChangeEffectorDescription::Response &res)
 {
 
@@ -61,6 +62,7 @@ bool KinematicChainsNode::ikService(node::CalculateIK::Request &req, node::Calcu
     tf::quaternionMsgToTF(req.goal.orientation, quat);
     double roll, pitch, yaw;
     tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);
+    //std::cout<<roll<<";\t"<<pitch<<";\t"<<yaw<<std::endl;
     double x, y, z;
     x = req.goal.position.x;
     y = req.goal.position.y;
@@ -71,8 +73,10 @@ bool KinematicChainsNode::ikService(node::CalculateIK::Request &req, node::Calcu
     destination.p[1] = y;
     destination.p[2] = z;
 
-    destination.M.RPY(roll, pitch, yaw);
+    destination.M = KDL::Rotation::RPY(roll, pitch, yaw);
+    //destination.M.RPY()
 
+    ROS_INFO("ik requested, goal coordinates:\nx:%.2f,  \ty:%.2f,  \tz:%.2f,\nroll:%.2f,\tpitch:%.2f,\tyaw:%.2f,\t", x,y,z, roll, pitch, yaw);
     if(manipulator->calculateIK(destination))
     {
         KDL::JntArray jnts = manipulator->getJnts();
@@ -82,7 +86,10 @@ bool KinematicChainsNode::ikService(node::CalculateIK::Request &req, node::Calcu
         joint_state.name.resize(jnts.rows());
         joint_state.position.resize(jnts.rows());
         for(int i = 0; i< jnts.rows(); i++)
+        {
             joint_state.position[i] = jnts(i);
+            joint_state.name[i] = manipulator->getJntName(i).c_str();
+        }
 
         res.jntCoordinates = joint_state;
 
@@ -113,21 +120,23 @@ void KinematicChainsNode::spin()
     {
 
         //to be removed
+
         //////////////////////////////////////////////////////
-        destination.p[0] = goal[0];
-        destination.p[1] = goal[1];
-        destination.p[2] = goal[2];
+//        destination.p[0] = goal[0];
+//        destination.p[1] = goal[1];
+//        destination.p[2] = goal[2];
 
-        double x,y,z,w;
-        destination.M.Quaternion(x,y,z,w);
-        destination.M.DoRotY(goal[3]);
-        destination.M.DoRotX(goal[4]);
-        destination.M.DoRotZ(goal[5]);
+//        double x,y,z,w;
+//        destination.M.Quaternion(x,y,z,w);
+//        destination.M.DoRotY(goal[3]);
+//        destination.M.DoRotX(goal[4]);
+//        destination.M.DoRotZ(goal[5]);
 
-        publishGoal();
+//        publishGoal();
 
-        manipulator->calculateIK(destination);
+//        manipulator->calculateIK(destination);
         publishForwardKinematics();
+
         //////////////////////////////////////////////////////
 
         ros::spinOnce();
@@ -218,3 +227,5 @@ bool KinematicChainsNode::parseRobotDescription(std::string parameterName, manip
     }
     return true;
 }
+
+

@@ -20,7 +20,7 @@ private:
     Manipulator *manipulator;
     void publishForwardKinematics();
     void publishGoal();
-    ros::ServiceServer service;
+    ros::ServiceServer service1, service2;
     bool ikService(node::CalculateIK::Request &req,
                    node::CalculateIK::Response &res);
     bool changeEffectorService(node::ChangeEffectorDescription::Request &req,
@@ -32,6 +32,7 @@ public:
     void spin();
     bool chainFromFile(std::string filename, KDL::Chain& outChain);
     bool parseRobotDescription(std::string parameterName, manipulator_part part, const char* root_name, const char* tip_name);
+
 };
 
 #endif
