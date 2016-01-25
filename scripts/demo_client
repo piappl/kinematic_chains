@@ -24,9 +24,9 @@ def requestIK(goal):
 def joy_callback(data):
 
     goal = Pose()
-    goal.position.x = data.axes[0]
-    goal.position.y = data.axes[1]
-    goal.position.z = data.axes[2]
+    goal.position.x = 0.5 * data.axes[0]
+    goal.position.y = 0.5 * data.axes[1]
+    goal.position.z =0.5+ 0.5 * data.axes[2]
     eulerx = data.axes[3]
     eulery = data.axes[4]
     eulerz = data.axes[5]

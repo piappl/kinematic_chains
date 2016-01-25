@@ -20,9 +20,9 @@ KinematicChainsNode::KinematicChainsNode(int argc, char **argv)
 
     // parsing joint names
     const char* arm_base = "link1";
-    const char* arm_tip = "link4";
+    const char* arm_tip = "link5";
     const char* tool_base = "link1";
-    const char* tool_tip = "link4";
+    const char* tool_tip = "link5";
 
     for(int i = 1; i< argc; i++)
     {
