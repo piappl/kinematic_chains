@@ -1,0 +1,9 @@
+<launch>
+    <param name="arm"  textfile="$(find kinematic_chains)/config/urdf/arm.urdf" />
+    <param name="tool" textfile="$(find kinematic_chains)/config/urdf/tool.urdf" />
+
+    <node pkg="kinematic_chains" type="kinematic_chains" name="inverse_kinematic_server" args="-tool tool -arm arm" output="screen"/>
+    <node pkg="kinematic_chains" type="demo_client" name="inverse_kinematic_client"/>
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find kinematic_chains)/config/kinematic_chains.rviz" />
+
+</launch>

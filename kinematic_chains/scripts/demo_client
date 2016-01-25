@@ -10,12 +10,13 @@ import tf
 def requestIK(goal):
     rospy.logwarn("Sending IK request") 
     rospy.wait_for_service('calculateIK')
+
     try:
         calculate = rospy.ServiceProxy('calculateIK', CalculateIK)
         joints = calculate(goal)  
-        rospy.loginfo("\033[1;92mRESPONSE: \033[0m")
-        rospy.loginfo(joints.jntCoordinates.name)
-        rospy.loginfo(joints.jntCoordinates.position)
+        rospy.logwarn("\033[1;92mRESPONSE: \033[0m")
+        rospy.logwarn(joints.jntCoordinates.name)
+        rospy.logwarn(joints.jntCoordinates.position)
         return joints
     except rospy.ServiceException, e:
         rospy.logerr(e)
@@ -41,11 +42,11 @@ def joy_callback(data):
                                             "base_link")
     rospy.loginfo("goal pose: x:%.1f, y:%.1f, z:%.1f, angles: x:%.1f, y:%.1f, z:%.1f" % (goal.position.x, goal.position.y, goal.position.z,
                                                                          eulerx, eulery, eulerz) )
-    bnumber = 4                           
-    if data.buttons[bnumber]:
-        requestIK(goal)
-    else:
-        rospy.logwarn("\033[1;91mto request IK, press joy %d\033[0m" % bnumber) 
+    #bnumber = 4                           
+    #if data.buttons[bnumber]:
+    requestIK(goal)
+    #else:
+    #    rospy.logwarn("\033[1;91mto request IK, press joy %d\033[0m" % bnumber) 
 
 if __name__ == "__main__":
     rospy.loginfo("node initialization")

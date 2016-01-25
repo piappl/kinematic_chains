@@ -2,6 +2,7 @@
 
 KinematicChainsNode::KinematicChainsNode(int argc, char **argv)
 {
+    ROS_INFO("Node init");
     ros::init(argc, argv, "KinematicChains");
     n = new ros::NodeHandle();
 
@@ -42,6 +43,7 @@ KinematicChainsNode::KinematicChainsNode(int argc, char **argv)
             parseRobotDescription(argv[i+1], Effector, tool_base, tool_tip);
         }
     }
+    ROS_INFO("Node inited");
 }
 
 bool KinematicChainsNode::changeEffectorService(kinematic_chains::ChangeEffectorDescription::Request &req, kinematic_chains::ChangeEffectorDescription::Response &res)
