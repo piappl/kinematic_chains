@@ -4,7 +4,7 @@
 void help()
 {
     std::cout<<"Usage:"<<std::endl;
-    std::cout<<"rosrun kinematic_chains kinematic_chains [-arm|-tool relevant_parameter_in_parameter_server [-arm_base|-arm_tip|-tool_base|-tool_tip] relevant_link_name_in_urdf_description]"<<std::endl;
+    std::cout<<"rosrun kinematic_chains kinematic_chains -arm parameter_name [-arm_base|-arm_tip link_name] [-tool parametaer_name [-tool_base|-tool_tip link_name]]"<<std::endl;
 }
 
 int main(int argc, char **argv)
