@@ -24,7 +24,7 @@ class Manipulator
 private:
     Chain arm, effector, chain;
     ChainIkSolverPos_NR* iksolverpos;
-    JntArray q_init, q;
+    JntArray previous_q, current_q;
     ChainFkSolverPos_recursive* fksolver;
     ChainIkSolverVel_pinv* iksolver;
     bool armInitialized, effectorInitialized;
@@ -38,8 +38,9 @@ public:
     bool calculateIK(Frame destination);
     Frame calculateFK(JntArray joints);
     Chain getChain(){return chain;}
-    JntArray getJnts(){return q;}
+    JntArray getJnts(){return current_q;}
     bool isInitialized();
+    bool isArmInitialized(){return armInitialized;}
     std::string getJntName(int i);
 
 

@@ -20,8 +20,22 @@ void Manipulator::reinit()
     chain = this->arm;
     chain.addChain(this->effector);
 
-    q_init = JntArray(chain.getNrOfJoints());
-    q = JntArray(chain.getNrOfJoints());
+    if(effectorInitialized) //state of joints has to be remained
+    {
+        JntArray tmp1 = current_q;
+        current_q = JntArray(chain.getNrOfJoints());
+        for(int i = 0; i<arm.getNrOfJoints();i++)
+        {
+            current_q(i) = tmp1(i);
+            std::cout<<"dupa "<<previous_q(i)<<std::endl;
+        }
+    }
+    else
+    {
+        current_q = JntArray(chain.getNrOfJoints());
+    }
+    previous_q = JntArray(chain.getNrOfJoints());
+
 
     fksolver = new ChainFkSolverPos_recursive(chain);
     iksolver = new ChainIkSolverVel_pinv(chain);
@@ -59,11 +73,11 @@ bool Manipulator::calculateIK(Frame destination)
     //ChainIkSolverVel_pinv iksolver(chain);
     //iksolverpos = new ChainIkSolverPos_NR(chain,fksolver,iksolver,100,1e-6);
     //std::cout<<"calculating inverse kinematics"<<std::endl;
-    q_init = q;
-    if( ChainIkSolverPos_NR::E_NOERROR == iksolverpos->CartToJnt(q_init,destination,q_out))
+    previous_q = current_q;
+    if( ChainIkSolverPos_NR::E_NOERROR == iksolverpos->CartToJnt(previous_q,destination,q_out))
     {
         //ROS_INFO("Solution found");
-        q = q_out;
+        current_q = q_out;
         return true;
     }
     //ROS_ERROR("No solution found");

@@ -2,7 +2,7 @@
 
 KinematicChainsNode::KinematicChainsNode(int argc, char **argv)
 {
-    ROS_INFO("Node init");
+    //ROS_INFO("Node init");
     ros::init(argc, argv, "KinematicChains");
     n = new ros::NodeHandle();
 
@@ -42,6 +42,14 @@ KinematicChainsNode::KinematicChainsNode(int argc, char **argv)
             std::cout<<"initialaizng effector with param: "<<argv[i+1]<<", joints: "<<tool_base<<", and "<<tool_tip<<std::endl;
             parseRobotDescription(argv[i+1], Effector, tool_base, tool_tip);
         }
+    }
+
+    if(!manipulator->isArmInitialized())
+    {
+        ROS_ERROR("Arm of the manipulator not initialized!");
+        ROS_ERROR("\033[1;92mUse \"-arm\" option to provide a parameter name containing a valid URDF arm description.\033[0m");
+        ROS_ERROR("Canceling.");
+        exit(-2);
     }
     ROS_INFO("Node inited");
 }
