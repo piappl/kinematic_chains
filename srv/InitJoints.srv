@@ -1,0 +1,6 @@
+string manipulator_part #arm | effector | both
+float64[] jointCoordinates
+
+---
+
+bool return_value

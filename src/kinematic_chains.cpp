@@ -17,6 +17,7 @@ KinematicChainsNode::KinematicChainsNode(int argc, char **argv)
 
     service1 = n->advertiseService("calculateIK",&KinematicChainsNode::ikService, this);
     service2 = n->advertiseService("changeEffectorDescription",&KinematicChainsNode::changeEffectorService, this);
+    service3 = n->advertiseService("initJoints",&KinematicChainsNode::jointInitializationService, this);
 
     // parsing joint names
     const char* arm_base = "link1";
@@ -52,6 +53,84 @@ KinematicChainsNode::KinematicChainsNode(int argc, char **argv)
         exit(-2);
     }
     ROS_INFO("Node inited");
+}
+
+bool KinematicChainsNode::jointInitializationService(kinematic_chains::InitJoints::Request &req, kinematic_chains::InitJoints::Response &res)
+{
+    bool _arm = false, _effector = false;
+    if(req.manipulator_part.compare("both") == 0)
+    {
+        _arm = _effector = true;
+        ROS_INFO("initializing joints of the arm and the tool");
+        if(req.jointCoordinates.capacity() != manipulator->getJnts().rows())
+        {
+            ROS_INFO("Expected number of joint coordinates: %d, number of coordintes provided: %d", manipulator->getJnts().rows(), (int)req.jointCoordinates.capacity() );
+            ROS_ERROR("Initialization of manipulator joints failed!");
+            return false;
+        }
+    }
+    else if(req.manipulator_part.compare("arm") == 0)
+    {
+        _arm = true;
+        ROS_INFO("initializing joints of the arm");
+        if(req.jointCoordinates.capacity() != manipulator->getNrOfArmJoints())
+        {
+            ROS_INFO("Expected number of joint coordinates: %d, number of coordintes provided: %d", manipulator->getNrOfArmJoints(), (int)req.jointCoordinates.capacity() );
+            ROS_ERROR("Initialization of arm joints failed!");
+            return false;
+        }
+    }
+    else if(req.manipulator_part.compare("effector") == 0)
+    {
+        _effector = true;
+        ROS_INFO("initializing joints of the tool");
+        if(req.jointCoordinates.capacity() != manipulator->getNrOfEffectorJoints())
+        {
+            ROS_INFO("Expected number of joint coordinates: %d, number of coordintes provided: %d", manipulator->getNrOfEffectorJoints(), (int)req.jointCoordinates.capacity() );
+            ROS_ERROR("Initialization of effector joints failed!");
+            return false;
+        }
+    }
+    else
+    {
+        ROS_ERROR("No manipulator part defined! Define a part you want to initialize (arm, effector, both). Initialization of effector joints failed!");
+        return false;
+    }
+
+    if(_effector && !manipulator->isEffectorInitialized())
+    {
+        ROS_ERROR("Effector not initialized. Initialization of effector joints failed!");
+        return false;
+    }
+    if(_arm && !manipulator->isArmInitialized())
+    {
+        ROS_ERROR("Arm not initialized. Initialization of arm joints failed!");
+        return false;
+    }
+
+    JntArray joints = manipulator->getJnts();
+
+    ROS_INFO("overall joints number: %d", joints.rows());
+
+    //current_q = JntArray(chain.getNrOfJoints());
+    if(_arm)
+        for(int i = 0; i<manipulator->getNrOfArmJoints();i++)
+        {
+            ROS_INFO("setting joint %d to %f", i,  req.jointCoordinates[i]);
+            joints(i) = req.jointCoordinates[i];
+        }
+
+    if(_effector)
+        for(int i = 0; i<manipulator->getNrOfEffectorJoints();i++)
+        {
+            ROS_INFO("setting effector joint %d, manipulator jonit %d to %f", i, i + manipulator->getNrOfArmJoints(), req.jointCoordinates[i+(_arm?manipulator->getNrOfArmJoints():0)]);
+            joints(i+manipulator->getNrOfArmJoints()) = req.jointCoordinates[i+(_arm?manipulator->getNrOfArmJoints():0)];
+        }
+
+    manipulator->setJoints(joints);
+
+    ROS_INFO("Joint coordinates initialized");
+    res.return_value = true;
 }
 
 bool KinematicChainsNode::changeEffectorService(kinematic_chains::ChangeEffectorDescription::Request &req, kinematic_chains::ChangeEffectorDescription::Response &res)

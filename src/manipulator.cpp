@@ -20,14 +20,13 @@ void Manipulator::reinit()
     chain = this->arm;
     chain.addChain(this->effector);
 
-    if(effectorInitialized) //state of joints has to be remained
+    if(armInitialized) //state of arms' joints has to remain
     {
         JntArray tmp1 = current_q;
         current_q = JntArray(chain.getNrOfJoints());
         for(int i = 0; i<arm.getNrOfJoints();i++)
         {
             current_q(i) = tmp1(i);
-            std::cout<<"dupa "<<previous_q(i)<<std::endl;
         }
     }
     else
@@ -49,6 +48,7 @@ void Manipulator::reinit()
 
 void Manipulator::setEffector(Chain chain)
 {
+    effectorInitialized = false;
     std::cout<<"initialazing effector"<<std::endl;
     this->effector = chain;
     reinit();
@@ -57,6 +57,7 @@ void Manipulator::setEffector(Chain chain)
 
 void Manipulator::setArm(Chain chain)
 {
+    armInitialized = false;
     //std::cout<<"initialazing arm"<<std::endl;
     this->arm = chain;
     reinit();
@@ -98,6 +99,18 @@ std::string Manipulator::getJntName(int i)
         ss<<"effector_";
     ss<<chain.getSegment(i).getJoint().getName();
     return ss.str();
+}
+
+bool Manipulator::setJoints(JntArray joints)
+{
+    if(joints.rows()==current_q.rows())
+    {
+        current_q = joints;
+        return true;
+    }else
+    {
+        return false;
+    }
 }
 
 

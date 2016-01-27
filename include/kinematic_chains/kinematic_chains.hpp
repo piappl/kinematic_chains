@@ -7,6 +7,7 @@
 #include <kdl_parser/kdl_parser.hpp>
 #include <kinematic_chains/CalculateIK.h>
 #include <kinematic_chains/ChangeEffectorDescription.h>
+#include <kinematic_chains/InitJoints.h>
 
 class KinematicChainsNode
 {
@@ -20,11 +21,14 @@ private:
     Manipulator *manipulator;
     void publishForwardKinematics();
     void publishGoal();
-    ros::ServiceServer service1, service2;
+    ros::ServiceServer service1, service2, service3;
     bool ikService(kinematic_chains::CalculateIK::Request &req,
                    kinematic_chains::CalculateIK::Response &res);
     bool changeEffectorService(kinematic_chains::ChangeEffectorDescription::Request &req,
                                kinematic_chains::ChangeEffectorDescription::Response &res);
+    bool jointInitializationService(kinematic_chains::InitJoints::Request &req,
+                                    kinematic_chains::InitJoints::Response &res);
+
     KDL::Frame destination;
 public:
     KinematicChainsNode(int argc, char **argv);
