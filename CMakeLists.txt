@@ -28,6 +28,7 @@ add_service_files(
   FILES
   CalculateIK.srv
   ChangeEffectorDescription.srv
+  InitJoints.srv
 )
 
 

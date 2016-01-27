@@ -41,8 +41,11 @@ public:
     JntArray getJnts(){return current_q;}
     bool isInitialized();
     bool isArmInitialized(){return armInitialized;}
+    bool isEffectorInitialized(){return effectorInitialized;}
     std::string getJntName(int i);
-
+    int getNrOfEffectorJoints(){return effector.getNrOfJoints();}
+    int getNrOfArmJoints(){return arm.getNrOfJoints();}
+    bool setJoints(JntArray joints);
 
 };
 
